@@ -20,6 +20,9 @@ const SongManagementPage = lazy(() => import('./pages/admin/SongManagementPage')
 const EventManagementPage = lazy(() => import('./pages/admin/EventManagementPage'));
 const MemberManagementPage = lazy(() => import('./pages/admin/MemberManagementPage'));
 const GalleryManagementPage = lazy(() => import('./pages/admin/GalleryManagementPage'));
+const JoinApplicationsPage = lazy(() => import('./pages/admin/JoinApplicationsPage'));
+const ContactSubmissionsPage = lazy(() => import('./pages/admin/ContactSubmissionsPage'));
+const AboutManagementPage = lazy(() => import('./pages/admin/AboutManagementPage'));
 
 // ─── Shared Layout Components ─────────────────────────────────────────────────
 const Navbar = lazy(() => import('./components/Navbar'));
@@ -110,14 +113,10 @@ export default function App() {
                 </AuthGuard>
               }
             />
-            <Route
-              path="/admin/gallery"
-              element={
-                <AuthGuard>
-                  <GalleryManagementPage />
-                </AuthGuard>
-              }
-            />
+            <Route path="/admin/gallery" element={<AuthGuard><GalleryManagementPage /></AuthGuard>} />
+            <Route path="/admin/join-applications" element={<AuthGuard><JoinApplicationsPage /></AuthGuard>} />
+            <Route path="/admin/contact-submissions" element={<AuthGuard><ContactSubmissionsPage /></AuthGuard>} />
+            <Route path="/admin/about" element={<AuthGuard><AboutManagementPage /></AuthGuard>} />
 
             {/* 404 */}
             <Route path="*" element={<NotFoundPage />} />
