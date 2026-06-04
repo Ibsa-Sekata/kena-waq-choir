@@ -8,6 +8,9 @@ const navItems = [
   { to: '/admin/events', icon: '📅', label: 'Events' },
   { to: '/admin/members', icon: '👥', label: 'Members' },
   { to: '/admin/gallery', icon: '📸', label: 'Gallery' },
+  { to: '/admin/about', icon: '📖', label: 'About Page' },
+  { to: '/admin/join-applications', icon: '🎤', label: 'Join Applications' },
+  { to: '/admin/contact-submissions', icon: '📩', label: 'Contact Messages' },
 ];
 
 export default function AdminLayout({ children, title }: { children: ReactNode; title: string }) {
