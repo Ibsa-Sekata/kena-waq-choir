@@ -183,4 +183,16 @@ router.put(
   },
 );
 
+// ─── DELETE /api/about/milestones/:id (admin) ─────────────────────────────────
+
+router.delete('/milestones/:id', authenticateJWT, async (req: Request, res: Response): Promise<void> => {
+  try {
+    await pool.execute('DELETE FROM history_milestones WHERE id = ?', [req.params.id]);
+    res.status(204).send();
+  } catch (err) {
+    console.error('[DELETE /api/about/milestones/:id]', err);
+    res.status(500).json({ error: { code: 'DATABASE_ERROR', message: 'Failed to delete milestone.' } });
+  }
+});
+
 export default router;
