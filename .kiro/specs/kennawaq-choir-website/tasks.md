@@ -1,0 +1,272 @@
+# Implementation Plan: KennaWaq Choir Website
+
+## Overview
+
+Implement the KennaWaq Choir Website as a full-stack application using React (frontend), Node.js + Express (backend), MySQL (database), and Cloudinary (media storage). The plan is structured to build the backend foundation first, then the public frontend, then the admin panel, wiring everything together incrementally.
+
+## Tasks
+
+- [x] 1. Project scaffolding and shared configuration
+  - Initialize a monorepo (or two separate directories: `client/` and `server/`) with `package.json` files
+  - Configure ESLint, Prettier, and TypeScript (`tsconfig.json`) for both client and server
+  - Create `.env.example` files documenting all required environment variables (DB credentials, Cloudinary keys, JWT secret)
+  - Set up a shared `types/` module (or inline interfaces) for `Song`, `Event`, `Member`, `GalleryItem`, `AudioPlayerState`, `SearchResult`
+  - _Requirements: 19.1_
+
+- [x] 2. Database setup and schema migration
+  - [x] 2.1 Write the MySQL schema migration script
+    - Create all tables: `admins`, `songs`, `events`, `members`, `albums`, `gallery_items`, `about_content`, `history_milestones`, `contact_submissions`, `join_applications`
+    - Add FULLTEXT indexes on `songs(title, category)` and `events(title, location, description)`
+    - Add foreign keys with `ON DELETE CASCADE` for `gallery_items → albums` and `gallery_items → events`
+    - _Requirements: 19.1, 19.2, 19.3, 19.4_
+  - [x] 2.2 Configure the mysql2 connection pool
+    - Create `server/src/db.ts` exporting a configured `mysql2` pool using environment variables
+    - Verify parameterized query usage (no string concatenation)
+    - _Requirements: 19.4_
+
+- [x] 3. Backend — Auth service and middleware
+  - [x] 3.1 Implement the admin login endpoint (`POST /api/auth/login`)
+    - Hash comparison with bcrypt (cost factor ≥ 12)
+    - Issue a JWT with 24-hour expiry on valid credentials
+    - Return HTTP 401 on invalid credentials without issuing a token
+    - _Requirements: 10.1, 10.2, 10.3, 10.6_
+  - [x] 3.2 Implement the `authenticateJWT` middleware
+    - Validate JWT signature and expiry on every protected route
+    - Return HTTP 401 for missing, malformed, or expired tokens
+    - _Requirements: 10.4, 10.5_
+  - [ ]* 3.3 Write property test for JWT authentication rejection (Property 12)
+    - **Property 12: JWT Authentication Rejection**
+    - Generate invalid/expired JWT strings with `fast-check`; call protected endpoints; assert HTTP 401 and no processing
+    - **Validates: Requirements 10.3, 10.5**
+
+- [x] 4. Backend — Songs service and routes
+  - [x] 4.1 Implement the Daily Worship Song algorithm as a pure function
+    - `getDailyWorshipSong(songs: Song[], nowUtcMs: number): Song`
+    - Uses `floor(nowUtcMs / 86400000) % songs.length` with worship-category preference and fallback
+    - _Requirements: 8.1, 8.2, 8.3, 8.4_
+  - [ ]* 4.2 Write property tests for the Daily Worship Song algorithm (Properties 1–3)
+    - **Property 1: Daily Worship Song Determinism** — two timestamps on the same UTC day return the same song
+    - **Property 2: Daily Worship Song Category Preference** — selection is always from the worship set when non-empty
+    - **Property 3: Daily Worship Song Fallback** — empty worship set falls back to full published set
+    - **Validates: Requirements 8.1, 8.2, 8.3, 8.4**
+  - [x] 4.3 Implement Songs CRUD routes
+    - `GET /api/songs` (with `?category=` and `?q=` filters using FULLTEXT search)
+    - `GET /api/songs/daily-worship` (calls the pure function from 4.1)
+    - `GET /api/songs/:id`
+    - `POST /api/songs` (admin, multipart: audio upload to Cloudinary, then DB insert)
+    - `PUT /api/songs/:id` (admin, metadata update)
+    - `DELETE /api/songs/:id` (admin, DB delete + Cloudinary destroy)
+    - Validate all required fields with `express-validator`; return consistent error envelope on failure
+    - _Requirements: 2.1, 2.3, 8.5, 11.1, 11.2, 11.3, 11.4, 11.5, 18.1, 18.2, 18.4_
+  - [ ]* 4.4 Write unit tests for Songs routes
+    - Mock DB pool and Cloudinary SDK
+    - Test validation rejection (missing title, missing audio file)
+    - Test successful create, update, delete flows
+    - _Requirements: 11.1, 11.2, 11.4, 11.5_
+
+- [x] 5. Backend — Search service and route
+  - [x] 5.1 Implement the Search service
+    - `searchSongs(keyword: string): Promise<Song[]>` — FULLTEXT query on `songs(title, category)`
+    - `searchEvents(keyword: string): Promise<Event[]>` — FULLTEXT query on `events(title, location, description)`
+    - `search(keyword: string, type: 'songs'|'events'|'all'): Promise<SearchResult>`
+    - Empty keyword returns all published records of the requested type
+    - `GET /api/search?q=&type=` route wired to the service
+    - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5, 15.6_
+  - [ ]* 5.2 Write property tests for the Search service (Properties 4–7)
+    - **Property 4: Song Search Result Correctness** — every returned song contains keyword (case-insensitive); no non-matching song appears
+    - **Property 5: Event Search Result Correctness** — every returned event contains keyword in title/location/description
+    - **Property 6: Combined Search Equals Union** — `search(k, 'all')` equals union of `search(k, 'songs')` and `search(k, 'events')`
+    - **Property 7: Empty Keyword Returns All Records** — empty keyword returns full published set
+    - **Validates: Requirements 2.3, 15.2, 15.3, 15.4, 15.5**
+
+- [ ] 6. Checkpoint — Backend core is functional
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [-] 7. Backend — Events, Members, Gallery, About, Contact/Join routes
+  - [x] 7.1 Implement Events CRUD routes
+    - `GET /api/events` (with `?q=` filter), `GET /api/events/:id`
+    - `POST /api/events`, `PUT /api/events/:id`, `DELETE /api/events/:id` (admin; cascade delete handled by FK)
+    - Validate required fields; return error envelope on failure
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 12.1, 12.2, 12.3, 12.4, 12.5_
+  - [ ]* 7.2 Write property test for Events chronological ordering (Property 13)
+    - **Property 13: Events Chronological Ordering**
+    - Generate random event arrays; assert upcoming events sorted ascending, past events sorted descending
+    - **Validates: Requirements 4.2, 4.3**
+  - [x] 7.3 Implement Members CRUD routes
+    - `GET /api/members`, `POST /api/members`, `PUT /api/members/:id`, `DELETE /api/members/:id` (admin)
+    - Multipart image upload to Cloudinary on create/update; Cloudinary destroy on delete
+    - Validate required fields
+    - _Requirements: 3.1, 13.1, 13.2, 13.3, 13.4, 13.5, 18.1, 18.2, 18.4_
+  - [x] 7.4 Implement Gallery routes
+    - `GET /api/gallery` (with `?album=` filter), `GET /api/gallery/albums`
+    - `POST /api/gallery`, `PUT /api/gallery/:id`, `DELETE /api/gallery/:id` (admin)
+    - `DELETE /api/gallery/albums/:albumName` (admin; cascade delete all items + Cloudinary assets)
+    - Validate required fields
+    - _Requirements: 6.1, 6.2, 14.1, 14.2, 14.3, 14.4, 14.5, 18.1, 18.2, 18.4_
+  - [ ]* 7.5 Write property test for Cascade Delete (Property 15)
+    - **Property 15: Cascade Delete Removes All Children**
+    - Generate parent records with varying child counts; delete parent; assert no orphaned children remain
+    - **Validates: Requirements 12.4, 14.4, 19.3**
+  - [ ] 7.6 Implement About, Contact, and Join routes
+    - `GET /api/about`, `PUT /api/about` (admin)
+    - `POST /api/contact` (validate name, email, message; persist to `contact_submissions`)
+    - `POST /api/join` (validate name, voice_type, experience_level; persist to `join_applications`)
+    - _Requirements: 5.1, 5.2, 5.3, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
+  - [ ]* 7.7 Write property test for Cloudinary Upload Atomicity (Property 10)
+    - **Property 10: Cloudinary Upload Atomicity**
+    - Mock Cloudinary to fail; attempt media upload; assert no DB record is created
+    - **Validates: Requirements 18.4**
+  - [ ]* 7.8 Write property test for Media Records Store URL Only (Property 14)
+    - **Property 14: Media Records Store URL Only**
+    - Mock Cloudinary returning a URL; assert DB record contains URL string, not binary data
+    - **Validates: Requirements 18.2**
+
+- [-] 8. Frontend — Project setup and shared infrastructure
+  - [x] 8.1 Bootstrap the React app with Vite + TypeScript
+    - Install and configure React Router v6, TanStack Query, React Hook Form, Yup, Axios, Framer Motion, and i18next
+    - Set up the Axios instance with base URL and the 401-interceptor (clear JWT, redirect to `/admin/login`)
+    - _Requirements: 9.1, 10.5_
+  - [ ] 8.2 Implement `AudioPlayerContext` and the persistent `<AudioPlayer>` component
+    - Context holds `currentTrack`, `queue`, `isPlaying`, `currentTime`, `duration`, `volume`
+    - Actions: `play(song)`, `addToQueue(songs)`, `next()`, `previous()`, `seek(time)`, `setVolume(v)`
+    - Auto-advance to next track on `ended` event; idle state when queue is empty
+    - Render `<AudioPlayer>` in `App.tsx` outside `<Routes>` so it persists across navigations
+    - Display current track title, elapsed time, total duration, play/pause, skip forward, skip backward, seek bar, volume control
+    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 2.5_
+  - [ ]* 8.3 Write property test for Audio Player queue navigation (Property 11)
+    - **Property 11: Audio Player Queue Navigation**
+    - Generate queues of length ≥ 2; simulate `next()` and `previous()` calls; assert correct track index advancement and retreat; assert auto-advance on `ended` matches manual `next()`
+    - **Validates: Requirements 9.3, 9.4, 9.5**
+  - [ ] 8.4 Implement `AuthContext` and `<AuthGuard>` component
+    - Store JWT and admin profile in context, persisted to `localStorage`
+    - `<AuthGuard>` redirects unauthenticated users to `/admin/login`
+    - _Requirements: 10.4, 10.5_
+  - [ ] 8.5 Implement shared UI components
+    - `<Navbar>` with responsive hamburger menu (collapses below 768px)
+    - `<Footer>`
+    - `<SongCard>`, `<EventCard>`, `<MemberCard>`, `<GalleryItem>` with correct props and play/download buttons
+    - Placeholder image fallback for missing member photos
+    - _Requirements: 1.1, 2.1, 3.1, 3.3, 4.4, 16.2_
+
+- [ ] 9. Frontend — Public pages
+  - [ ] 9.1 Implement the Home Page
+    - Fetch and display `DailyWorshipSongCard` from `GET /api/songs/daily-worship`
+    - Fetch and display the nearest upcoming event from `GET /api/events`
+    - Featured video section
+    - Play button on featured song triggers `AudioPlayerContext.play()`
+    - Clicking the event highlight navigates to `/events?id=<eventId>`
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+  - [ ] 9.2 Implement the Songs Page
+    - Fetch all songs from `GET /api/songs`; render as `<SongCard>` grid
+    - Category filter buttons (worship, live, album) — client-side filter or `?category=` query param
+    - Search bar wired to `GET /api/search?q=&type=songs`; show "No songs found" when empty results
+    - Play button calls `AudioPlayerContext.play(song)` and `addToQueue(remainingVisibleSongs)`
+    - Download button triggers file download where `downloadUrl` exists
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.6, 2.7, 2.8_
+  - [ ] 9.3 Implement the Members Page
+    - Fetch members from `GET /api/members`; group by `roleCategory`
+    - Render responsive grid (1-col < 480px, 2-col 480–768px, multi-col > 768px)
+    - Placeholder image on missing `imageUrl`
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 16.4_
+  - [ ] 9.4 Implement the Events Page
+    - Fetch events from `GET /api/events`; split into upcoming (ascending) and past (descending)
+    - Render `<EventCard>` with title, date, location, description, and optional "Register" button (opens in new tab)
+    - Past events gallery section showing associated `GalleryItem`s
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
+  - [ ] 9.5 Implement the About Page
+    - Fetch content from `GET /api/about`; render Mission, Vision, and History Timeline sections
+    - _Requirements: 5.1, 5.2, 5.3_
+  - [ ] 9.6 Implement the Gallery Page
+    - Fetch albums from `GET /api/gallery/albums`; fetch items from `GET /api/gallery?album=`
+    - Album selector, responsive grid, lightbox overlay for photos, video modal for videos
+    - Close lightbox/modal without full page reload
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - [ ] 9.7 Implement the Contact/Join Page
+    - Contact form (name, email, message — all required) with React Hook Form + Yup validation
+    - Join form (name, voice type, experience level — required; message — optional)
+    - Field-level validation errors shown before submission; success confirmation on submit
+    - WhatsApp button opens chat link in new tab; email address displayed
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8_
+  - [ ]* 9.8 Write property tests for form validation (Properties 8 and 9)
+    - **Property 8: Form Validation Rejects Incomplete Submissions** — generate contact/join submissions with at least one blank required field; assert no API call is made and field-level errors are shown
+    - **Property 9: Admin Form Validation Rejects Incomplete Records** — generate admin form payloads with missing required fields; assert no DB write and validation error returned
+    - **Validates: Requirements 7.4, 7.7, 11.5, 12.5, 13.5, 14.5**
+
+- [ ] 10. Checkpoint — Public site is functional end-to-end
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [-] 11. Frontend — Admin Panel
+  - [x] 11.1 Implement the Admin Login Page
+    - Form with email and password fields; POST to `/api/auth/login`
+    - Store JWT in `AuthContext` / `localStorage` on success; show error on 401
+    - _Requirements: 10.1, 10.2, 10.3_
+  - [x] 11.2 Implement the Admin Dashboard and navigation
+    - `<AdminNavbar>` with links to Song, Event, Member, and Gallery management pages
+    - All admin routes wrapped in `<AuthGuard>`
+    - _Requirements: 10.4_
+  - [x] 11.3 Implement Song Management Page and SongForm
+    - List all songs with edit and delete buttons
+    - `<SongForm>` for create/edit: title, audio file upload, optional video URL, category, download availability
+    - On submit: POST/PUT to `/api/songs`; invalidate React Query cache
+    - Delete: DELETE `/api/songs/:id`; confirm before delete
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
+  - [x] 11.4 Implement Event Management Page and EventForm
+    - List all events with edit and delete buttons
+    - `<EventForm>` for create/edit: title, date, location, description, optional registration URL
+    - On submit: POST/PUT to `/api/events`; invalidate cache
+    - Delete: DELETE `/api/events/:id`; confirm before delete
+    - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
+  - [x] 11.5 Implement Member Management Page and MemberForm
+    - List all members with edit and delete buttons
+    - `<MemberForm>` for create/edit: name, role, role category, profile image upload
+    - On submit: POST/PUT to `/api/members`; invalidate cache
+    - Delete: DELETE `/api/members/:id`; confirm before delete
+    - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
+  - [x] 11.6 Implement Gallery Management Page
+    - `<AlbumManager>` to create, rename, and delete albums
+    - `<GalleryItemForm>` to upload media (photo/video), assign to album, add caption
+    - Delete album: DELETE `/api/gallery/albums/:albumName`; confirm before delete
+    - Delete item: DELETE `/api/gallery/:id`
+    - _Requirements: 14.1, 14.2, 14.3, 14.4, 14.5_
+
+- [ ] 12. Responsive design and accessibility pass
+  - Apply mobile-first CSS across all public pages and the admin panel
+  - Verify single-column layout below 480px, two-column between 480–768px, multi-column above 768px for card grids
+  - Verify hamburger menu renders and functions below 768px
+  - Verify `<AudioPlayer>` is accessible and functional at all breakpoints (320px–2560px)
+  - Add `aria-label`, `role`, and keyboard navigation attributes to interactive elements (player controls, modals, forms)
+  - _Requirements: 16.1, 16.2, 16.3, 16.4_
+
+- [ ] 13. Multi-language support (i18n)
+  - [ ] 13.1 Configure i18next with English and one local language
+    - Set up `i18next` + `react-i18next`; create translation JSON files for both languages
+    - _Requirements: 17.1_
+  - [ ] 13.2 Add language selector to all public pages
+    - Render a language toggle/dropdown in the `<Navbar>`
+    - On selection, switch language without full page reload; persist preference to `localStorage`
+    - _Requirements: 17.2, 17.3, 17.4_
+
+- [ ] 14. Integration wiring and final integration tests
+  - [ ] 14.1 Wire all frontend pages to live backend endpoints
+    - Replace any mock data with real React Query hooks pointing to the Express API
+    - Verify Axios 401 interceptor clears JWT and redirects to `/admin/login`
+    - _Requirements: 10.5_
+  - [ ]* 14.2 Write integration tests (Supertest)
+    - Auth flow: login → receive JWT → access protected route → expired JWT rejected
+    - Song CRUD: create → read → update → delete (mocked Cloudinary)
+    - Event cascade delete: create event with gallery items → delete event → gallery items gone
+    - Search endpoint: keyword returns correct subset; empty keyword returns all
+    - _Requirements: 10.2, 10.3, 10.5, 11.2, 11.4, 12.4, 15.2, 15.5_
+
+- [ ] 15. Final checkpoint — Full system verified
+  - Ensure all tests pass, ask the user if questions arise.
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for a faster MVP
+- Each task references specific requirements for traceability
+- Property tests use `fast-check` with a minimum of 100 iterations per property; each test is tagged with `// Feature: kennawaq-choir-website, Property N: <property text>`
+- Unit tests use Jest + React Testing Library; integration tests use Supertest
+- The `<AudioPlayer>` is rendered outside `<Routes>` in `App.tsx` to guarantee persistence across navigations
+- All DB queries use `mysql2` parameterized statements — no string concatenation
+- Cloudinary uploads are wrapped in try/catch; on failure no DB write occurs (atomicity)
