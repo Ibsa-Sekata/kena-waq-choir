@@ -1,0 +1,143 @@
+{
+  "nav": {
+    "home": "Home",
+    "songs": "Songs",
+    "members": "Members",
+    "events": "Events",
+    "about": "About",
+    "gallery": "Gallery",
+    "contact": "Contact & Join",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero": {
+      "title": "KennaWaq Choir",
+      "subtitle": "Lifting voices in worship and praise",
+      "cta": "Listen Now"
+    },
+    "dailyWorship": {
+      "title": "Daily Worship Song",
+      "play": "Play"
+    },
+    "featuredVideo": {
+      "title": "Featured Video"
+    },
+    "upcomingEvent": {
+      "title": "Upcoming Event",
+      "viewAll": "View All Events",
+      "noEvents": "No upcoming events at this time."
+    }
+  },
+  "songs": {
+    "title": "Songs",
+    "searchPlaceholder": "Search songs...",
+    "categories": {
+      "all": "All",
+      "worship": "Worship",
+      "live": "Live",
+      "album": "Album"
+    },
+    "play": "Play",
+    "download": "Download",
+    "noResults": "No songs found for your search.",
+    "addToQueue": "Add to Queue"
+  },
+  "members": {
+    "title": "Our Members",
+    "roles": {
+      "choirLeader": "Choir Leader",
+      "soprano": "Sopranos",
+      "alto": "Altos",
+      "tenor": "Tenors",
+      "bass": "Bass"
+    }
+  },
+  "events": {
+    "title": "Events",
+    "upcoming": "Upcoming Events",
+    "past": "Past Events",
+    "register": "Register",
+    "noUpcoming": "No upcoming events at this time.",
+    "noPast": "No past events yet.",
+    "gallery": "Event Gallery"
+  },
+  "about": {
+    "title": "About Us",
+    "mission": "Our Mission",
+    "vision": "Our Vision",
+    "history": "Our History"
+  },
+  "gallery": {
+    "title": "Gallery",
+    "allAlbums": "All Albums",
+    "close": "Close"
+  },
+  "contact": {
+    "title": "Contact & Join",
+    "contactForm": {
+      "title": "Send Us a Message",
+      "name": "Your Name",
+      "email": "Email Address",
+      "message": "Message",
+      "submit": "Send Message",
+      "success": "Your message has been sent. We'll get back to you soon!",
+      "error": "Something went wrong. Please try again."
+    },
+    "joinForm": {
+      "title": "Join the Choir",
+      "name": "Full Name",
+      "voiceType": "Voice Type",
+      "voiceTypes": {
+        "soprano": "Soprano",
+        "alto": "Alto",
+        "tenor": "Tenor",
+        "bass": "Bass"
+      },
+      "experienceLevel": "Experience Level",
+      "message": "Additional Message (optional)",
+      "submit": "Apply to Join",
+      "success": "Your application has been submitted. We'll be in touch!",
+      "error": "Something went wrong. Please try again."
+    },
+    "whatsapp": "Chat on WhatsApp",
+    "email": "Email Us"
+  },
+  "player": {
+    "nowPlaying": "Now Playing",
+    "play": "Play",
+    "pause": "Pause",
+    "next": "Next",
+    "previous": "Previous",
+    "volume": "Volume",
+    "idle": "No track playing"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again.",
+    "notFound": "Page not found.",
+    "backHome": "Back to Home",
+    "required": "This field is required.",
+    "invalidEmail": "Please enter a valid email address."
+  },
+  "admin": {
+    "login": {
+      "title": "Admin Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log In",
+      "error": "Invalid email or password."
+    },
+    "dashboard": "Dashboard",
+    "songs": "Song Management",
+    "events": "Event Management",
+    "members": "Member Management",
+    "gallery": "Gallery Management",
+    "logout": "Log Out",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create New",
+    "confirmDelete": "Are you sure you want to delete this item? This action cannot be undone."
+  }
+}

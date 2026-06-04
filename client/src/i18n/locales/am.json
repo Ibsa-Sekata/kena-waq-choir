@@ -1,0 +1,143 @@
+{
+  "nav": {
+    "home": "መነሻ",
+    "songs": "መዝሙሮች",
+    "members": "አባላት",
+    "events": "ዝግጅቶች",
+    "about": "ስለ እኛ",
+    "gallery": "ጋለሪ",
+    "contact": "ያግኙን እና ይቀላቀሉ",
+    "admin": "አስተዳዳሪ"
+  },
+  "home": {
+    "hero": {
+      "title": "ቀናዋቅ ዘማሪ ቡድን",
+      "subtitle": "ድምፃችንን ለአምልኮ እና ለምስጋና እናሰማ",
+      "cta": "አሁን ያዳምጡ"
+    },
+    "dailyWorship": {
+      "title": "የዕለቱ የአምልኮ መዝሙር",
+      "play": "አጫውት"
+    },
+    "featuredVideo": {
+      "title": "ተለይቶ የቀረበ ቪዲዮ"
+    },
+    "upcomingEvent": {
+      "title": "መጪ ዝግጅት",
+      "viewAll": "ሁሉንም ዝግጅቶች ይመልከቱ",
+      "noEvents": "በዚህ ጊዜ መጪ ዝግጅቶች የሉም።"
+    }
+  },
+  "songs": {
+    "title": "መዝሙሮች",
+    "searchPlaceholder": "መዝሙሮችን ይፈልጉ...",
+    "categories": {
+      "all": "ሁሉም",
+      "worship": "አምልኮ",
+      "live": "ቀጥታ",
+      "album": "አልበም"
+    },
+    "play": "አጫውት",
+    "download": "አውርድ",
+    "noResults": "ለፍለጋዎ ምንም መዝሙሮች አልተገኙም።",
+    "addToQueue": "ወደ ዝርዝር ጨምር"
+  },
+  "members": {
+    "title": "አባሎቻችን",
+    "roles": {
+      "choirLeader": "የዘማሪ ቡድን መሪ",
+      "soprano": "ሶፕራኖ",
+      "alto": "አልቶ",
+      "tenor": "ቴኖር",
+      "bass": "ባስ"
+    }
+  },
+  "events": {
+    "title": "ዝግጅቶች",
+    "upcoming": "መጪ ዝግጅቶች",
+    "past": "ያለፉ ዝግጅቶች",
+    "register": "ይመዝገቡ",
+    "noUpcoming": "በዚህ ጊዜ መጪ ዝግጅቶች የሉም።",
+    "noPast": "ገና ያለፉ ዝግጅቶች የሉም።",
+    "gallery": "የዝግጅት ጋለሪ"
+  },
+  "about": {
+    "title": "ስለ እኛ",
+    "mission": "ተልዕኮአችን",
+    "vision": "ራዕያችን",
+    "history": "ታሪካችን"
+  },
+  "gallery": {
+    "title": "ጋለሪ",
+    "allAlbums": "ሁሉም አልበሞች",
+    "close": "ዝጋ"
+  },
+  "contact": {
+    "title": "ያግኙን እና ይቀላቀሉ",
+    "contactForm": {
+      "title": "መልዕክት ይላኩልን",
+      "name": "ስምዎ",
+      "email": "የኢሜይል አድራሻ",
+      "message": "መልዕክት",
+      "submit": "መልዕክት ላክ",
+      "success": "መልዕክትዎ ተልኳል። በቅርቡ እናገኝዎታለን!",
+      "error": "ችግር ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።"
+    },
+    "joinForm": {
+      "title": "ዘማሪ ቡድኑን ይቀላቀሉ",
+      "name": "ሙሉ ስም",
+      "voiceType": "የድምፅ አይነት",
+      "voiceTypes": {
+        "soprano": "ሶፕራኖ",
+        "alto": "አልቶ",
+        "tenor": "ቴኖር",
+        "bass": "ባስ"
+      },
+      "experienceLevel": "የልምድ ደረጃ",
+      "message": "ተጨማሪ መልዕክት (አማራጭ)",
+      "submit": "ለመቀላቀል ያመልክቱ",
+      "success": "ማመልከቻዎ ተቀብሏል። እናገኝዎታለን!",
+      "error": "ችግር ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።"
+    },
+    "whatsapp": "በዋትስአፕ ያናግሩን",
+    "email": "ኢሜይል ይላኩልን"
+  },
+  "player": {
+    "nowPlaying": "እየተጫወተ ያለው",
+    "play": "አጫውት",
+    "pause": "አቁም",
+    "next": "ቀጣይ",
+    "previous": "ቀዳሚ",
+    "volume": "ድምፅ",
+    "idle": "ምንም ትራክ አልተጫወተም"
+  },
+  "common": {
+    "loading": "በመጫን ላይ...",
+    "error": "ስህተት ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።",
+    "notFound": "ገጹ አልተገኘም።",
+    "backHome": "ወደ መነሻ ተመለስ",
+    "required": "ይህ መስክ ያስፈልጋል።",
+    "invalidEmail": "እባክዎ ትክክለኛ የኢሜይል አድራሻ ያስገቡ።"
+  },
+  "admin": {
+    "login": {
+      "title": "የአስተዳዳሪ መግቢያ",
+      "email": "ኢሜይል",
+      "password": "የይለፍ ቃል",
+      "submit": "ግባ",
+      "error": "ኢሜይል ወይም የይለፍ ቃል ትክክል አይደለም።"
+    },
+    "dashboard": "ዳሽቦርድ",
+    "songs": "የመዝሙር አስተዳደር",
+    "events": "የዝግጅት አስተዳደር",
+    "members": "የአባላት አስተዳደር",
+    "gallery": "የጋለሪ አስተዳደር",
+    "logout": "ውጣ",
+    "save": "አስቀምጥ",
+    "cancel": "ሰርዝ",
+    "delete": "ሰርዝ",
+    "edit": "አርትዕ",
+    "create": "አዲስ ፍጠር",
+    "confirmDelete": "ይህን ንጥል መሰረዝ ይፈልጋሉ? ይህ ድርጊት ሊቀለበስ አይችልም።"
+  }
+}
